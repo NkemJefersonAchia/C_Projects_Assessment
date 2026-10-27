@@ -78,3 +78,27 @@ void destroy_database(StudentDB *db) {
         free(db);
     }
 }
+
+// ---------------------------------------------------------------
+// Utility helpers
+// ---------------------------------------------------------------
+
+// Finds a student by ID using pointer traversal, returns index or -1
+int find_student_by_id(StudentDB *db, int id) {
+    Student *ptr = db->records;
+    int i;
+    for (i = 0; i < db->count; i++, ptr++) {
+        if (ptr->id == id) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Swaps two student records using a pointer-based approach
+void swap_students(Student *a, Student *b) {
+    Student temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
