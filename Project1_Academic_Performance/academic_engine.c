@@ -16,3 +16,31 @@
 #define INITIAL_CAPACITY 15
 #define PASS_THRESHOLD 50.0
 #define NUM_MENU_OPTIONS 9
+
+// Risk level thresholds for the Academic Risk Index
+#define RISK_HIGH_THRESHOLD 75.0
+#define RISK_ELEVATED_THRESHOLD 55.0
+#define RISK_MODERATE_THRESHOLD 30.0
+
+// ---------------------------------------------------------------
+// Structures
+// ---------------------------------------------------------------
+
+// Student record structure
+typedef struct {
+    int id;
+    char name[MAX_NAME_LEN];
+    char course[MAX_COURSE_LEN];
+    float grade;
+} Student;
+
+// Database container for dynamic student management
+typedef struct {
+    Student *records;
+    int count;
+    int capacity;
+} StudentDB;
+
+// Function pointer type for menu operations
+typedef void (*MenuFunction)(StudentDB *);
+
