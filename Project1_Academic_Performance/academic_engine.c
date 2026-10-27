@@ -68,3 +68,13 @@ StudentDB *create_database(int initial_capacity) {
     return db;
 }
 
+// Frees all dynamically allocated memory in the database
+void destroy_database(StudentDB *db) {
+    if (db != NULL) {
+        if (db->records != NULL) {
+            free(db->records);
+            db->records = NULL;
+        }
+        free(db);
+    }
+}
