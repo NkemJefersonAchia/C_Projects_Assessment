@@ -269,3 +269,22 @@ void sort_students(StudentDB *db) {
 }
 
 // Calculates and displays the average grade using pointer arithmetic
+void calculate_average(StudentDB *db) {
+    if (db->count == 0) {
+        printf("\nNo student records available.\n");
+        return;
+    }
+
+    float total = 0.0;
+    Student *ptr = db->records;
+    int i;
+
+    for (i = 0; i < db->count; i++) {
+        total += (ptr + i)->grade;
+    }
+
+    float average = total / db->count;
+    printf("\nAverage grade across %d students: %.2f\n", db->count, average);
+}
+
+// Finds and displays the top-performing student using pointer traversal
