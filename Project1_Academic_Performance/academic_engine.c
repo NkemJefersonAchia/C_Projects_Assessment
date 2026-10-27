@@ -608,3 +608,51 @@ void generate_summary_report(StudentDB *db) {
     printf("========================================================\n");
 }
 
+// ---------------------------------------------------------------
+// Initial data loading
+// ---------------------------------------------------------------
+
+// Loads the initial dataset of 12 students into the database
+void load_initial_data(StudentDB *db) {
+    Student initial_data[] = {
+        {1001, "Amara Okafor",     "Data Structures",    78.5},
+        {1002, "Brian Kimani",     "Algorithms",         92.0},
+        {1003, "Chioma Eze",       "Operating Systems",  45.0},
+        {1004, "David Mensah",     "Data Structures",    63.5},
+        {1005, "Esther Wanjiku",   "Algorithms",         88.0},
+        {1006, "Felix Adeyemi",    "Computer Networks",  35.0},
+        {1007, "Grace Achieng",    "Operating Systems",  71.0},
+        {1008, "Hassan Diallo",    "Data Structures",    55.5},
+        {1009, "Irene Banda",      "Computer Networks",  82.0},
+        {1010, "James Mwangi",     "Algorithms",         29.5},
+        {1011, "Kemi Ogundimu",    "Operating Systems",  67.0},
+        {1012, "Liam Nkrumah",     "Data Structures",    91.5}
+    };
+
+    int num_students = sizeof(initial_data) / sizeof(initial_data[0]);
+    int i;
+
+    for (i = 0; i < num_students; i++) {
+        if (db->count >= db->capacity) {
+            int new_cap = db->capacity * 2;
+            Student *new_rec = (Student *)realloc(db->records, new_cap * sizeof(Student));
+            if (new_rec == NULL) {
+                printf("Error: Memory allocation failed during data loading.\n");
+                return;
+            }
+            db->records = new_rec;
+            db->capacity = new_cap;
+        }
+
+        Student *dest = db->records + db->count;
+        *dest = initial_data[i];
+        db->count++;
+    }
+
+    printf("Loaded %d initial student records.\n", num_students);
+}
+
+// ---------------------------------------------------------------
+// Main function
+// ---------------------------------------------------------------
+
