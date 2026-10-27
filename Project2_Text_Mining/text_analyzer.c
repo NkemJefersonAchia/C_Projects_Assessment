@@ -78,3 +78,16 @@ TextData *create_text_data(void) {
 }
 
 // Frees all dynamically allocated memory
+void destroy_text_data(TextData *data) {
+    if (data != NULL) {
+        if (data->text != NULL) free(data->text);
+        if (data->words != NULL) free(data->words);
+        free(data);
+    }
+}
+
+// ---------------------------------------------------------------
+// Text processing helpers
+// ---------------------------------------------------------------
+
+// Converts a string to lowercase in place using pointer traversal
