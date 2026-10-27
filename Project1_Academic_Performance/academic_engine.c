@@ -44,3 +44,27 @@ typedef struct {
 // Function pointer type for menu operations
 typedef void (*MenuFunction)(StudentDB *);
 
+// ---------------------------------------------------------------
+// Database lifecycle functions
+// ---------------------------------------------------------------
+
+// Creates and initializes a new student database with given capacity
+StudentDB *create_database(int initial_capacity) {
+    StudentDB *db = (StudentDB *)malloc(sizeof(StudentDB));
+    if (db == NULL) {
+        printf("Error: Failed to allocate memory for database.\n");
+        return NULL;
+    }
+
+    db->records = (Student *)malloc(initial_capacity * sizeof(Student));
+    if (db->records == NULL) {
+        printf("Error: Failed to allocate memory for student records.\n");
+        free(db);
+        return NULL;
+    }
+
+    db->count = 0;
+    db->capacity = initial_capacity;
+    return db;
+}
+
