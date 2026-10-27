@@ -195,3 +195,25 @@ void add_student(StudentDB *db) {
 }
 
 // Displays all student records in a formatted table using pointer traversal
+void display_students(StudentDB *db) {
+    if (db->count == 0) {
+        printf("\nNo student records to display.\n");
+        return;
+    }
+
+    printf("\n%-6s %-25s %-20s %-8s\n", "ID", "Name", "Course", "Grade");
+    printf("--------------------------------------------------------------\n");
+
+    // Pointer-based traversal instead of array indexing
+    Student *ptr = db->records;
+    Student *end = db->records + db->count;
+    while (ptr < end) {
+        printf("%-6d %-25s %-20s %-8.1f\n",
+               ptr->id, ptr->name, ptr->course, ptr->grade);
+        ptr++;
+    }
+    printf("--------------------------------------------------------------\n");
+    printf("Total records: %d\n", db->count);
+}
+
+// Sorts students by user-selected criteria
