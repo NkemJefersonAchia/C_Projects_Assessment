@@ -379,3 +379,55 @@ void search_student(StudentDB *db) {
 }
 
 // Removes a student record by ID and shrinks memory if possible
+void remove_student(StudentDB *db) {
+    if (db->count == 0) {
+        printf("\nNo student records to remove.\n");
+        return;
+    }
+
+    int id;
+    printf("\n--- Remove Student ---\n");
+    printf("Enter student ID to remove: ");
+    if (scanf("%d", &id) != 1) {
+        printf("Invalid ID format.\n");
+        while (getchar() != '\n');
+        return;
+    }
+    while (getchar() != '\n');
+
+    int index = find_student_by_id(db, id);
+    if (index == -1) {
+        printf("Student with ID %d not found.\n", id);
+        return;
+    }
+
+    char removed_name[MAX_NAME_LEN];
+    strncpy(removed_name, (db->records + index)->name, MAX_NAME_LEN - 1);
+    removed_name[MAX_NAME_LEN - 1] = '\0';
+
+    // Shift remaining records left using pointer arithmetic
+    Student *target = db->records + index;
+    Student *source = target + 1;
+    int remaining = db->count - index - 1;
+    if (remaining > 0) {
+        memmove(target, source, remaining * sizeof(Student));
+    }
+
+    db->count--;
+    printf("Student '%s' (ID: %d) removed successfully.\n", removed_name, id);
+
+    // Shrink capacity if count drops below a quarter of capacity
+    if (db->count > 0 && db->count < db->capacity / 4 && db->capacity > INITIAL_CAPACITY) {
+        int new_capacity = db->capacity / 2;
+        if (new_capacity < INITIAL_CAPACITY) {
+            new_capacity = INITIAL_CAPACITY;
+        }
+        Student *new_records = (Student *)realloc(db->records, new_capacity * sizeof(Student));
+        if (new_records != NULL) {
+            db->records = new_records;
+            db->capacity = new_capacity;
+            printf("(Database shrunk to capacity %d)\n", new_capacity);
+        }
+    }
+}
+
