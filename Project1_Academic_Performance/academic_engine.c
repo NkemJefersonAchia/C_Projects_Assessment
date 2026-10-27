@@ -656,3 +656,72 @@ void load_initial_data(StudentDB *db) {
 // Main function
 // ---------------------------------------------------------------
 
+int main(void) {
+    // Array of function pointers mapping menu choices to operations
+    MenuFunction menu_functions[NUM_MENU_OPTIONS] = {
+        add_student,
+        display_students,
+        sort_students,
+        calculate_average,
+        find_top_student,
+        search_student,
+        remove_student,
+        custom_analysis,
+        generate_summary_report
+    };
+
+    // Initialize the database
+    StudentDB *db = create_database(INITIAL_CAPACITY);
+    if (db == NULL) {
+        printf("Fatal error: Could not initialize database.\n");
+        return 1;
+    }
+
+    printf("========================================================\n");
+    printf("Student ID: N.Achia\n");
+    printf("Project: Dynamic Academic Performance and Risk\n");
+    printf("         Analysis Engine\n");
+    printf("Custom Analysis: Academic Risk Index\n");
+    printf("========================================================\n");
+
+    load_initial_data(db);
+
+    int choice;
+    int running = 1;
+
+    while (running) {
+        printf("\n--- MAIN MENU ---\n");
+        printf("1.  Add a new student record\n");
+        printf("2.  Display all student records\n");
+        printf("3.  Sort students\n");
+        printf("4.  Calculate average grade\n");
+        printf("5.  Find top-performing student\n");
+        printf("6.  Search for a student\n");
+        printf("7.  Remove a student record\n");
+        printf("8.  Run Academic Risk Index analysis\n");
+        printf("9.  Display summary report\n");
+        printf("10. Exit\n");
+        printf("Enter your choice: ");
+
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Please enter a number.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+        while (getchar() != '\n');
+
+        if (choice == 10) {
+            printf("\nFreeing all allocated memory...\n");
+            destroy_database(db);
+            printf("Program terminated. Goodbye!\n");
+            running = 0;
+        } else if (choice >= 1 && choice <= NUM_MENU_OPTIONS) {
+            // Dispatch using function pointer array
+            menu_functions[choice - 1](db);
+        } else {
+            printf("Invalid choice. Please select 1-10.\n");
+        }
+    }
+
+    return 0;
+}
