@@ -313,3 +313,69 @@ void find_top_student(StudentDB *db) {
 }
 
 // Searches for a student by ID or name
+void search_student(StudentDB *db) {
+    if (db->count == 0) {
+        printf("\nNo student records available.\n");
+        return;
+    }
+
+    int choice;
+    printf("\n--- Search Student ---\n");
+    printf("1. Search by ID\n");
+    printf("2. Search by Name\n");
+    printf("Enter choice: ");
+
+    if (scanf("%d", &choice) != 1 || (choice != 1 && choice != 2)) {
+        printf("Invalid search option.\n");
+        while (getchar() != '\n');
+        return;
+    }
+    while (getchar() != '\n');
+
+    if (choice == 1) {
+        int id;
+        printf("Enter student ID: ");
+        if (scanf("%d", &id) != 1) {
+            printf("Invalid ID format.\n");
+            while (getchar() != '\n');
+            return;
+        }
+        while (getchar() != '\n');
+
+        int index = find_student_by_id(db, id);
+        if (index == -1) {
+            printf("Student with ID %d not found.\n", id);
+        } else {
+            Student *s = db->records + index;
+            printf("\nStudent Found:\n");
+            printf("ID: %d | Name: %s | Course: %s | Grade: %.1f\n",
+                   s->id, s->name, s->course, s->grade);
+        }
+    } else {
+        char search_name[MAX_NAME_LEN];
+        printf("Enter student name: ");
+        if (fgets(search_name, MAX_NAME_LEN, stdin) == NULL) {
+            printf("Error reading input.\n");
+            return;
+        }
+        search_name[strcspn(search_name, "\n")] = '\0';
+
+        int found = 0;
+        Student *ptr = db->records;
+        int i;
+        for (i = 0; i < db->count; i++, ptr++) {
+            if (strcmp(ptr->name, search_name) == 0) {
+                printf("\nStudent Found:\n");
+                printf("ID: %d | Name: %s | Course: %s | Grade: %.1f\n",
+                       ptr->id, ptr->name, ptr->course, ptr->grade);
+                found = 1;
+            }
+        }
+
+        if (!found) {
+            printf("No student with name '%s' found.\n", search_name);
+        }
+    }
+}
+
+// Removes a student record by ID and shrinks memory if possible
