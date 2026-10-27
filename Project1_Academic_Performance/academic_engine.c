@@ -431,3 +431,31 @@ void remove_student(StudentDB *db) {
     }
 }
 
+// ---------------------------------------------------------------
+// Custom Analysis: Academic Risk Index
+// ---------------------------------------------------------------
+
+// Calculates the risk score for a single student
+// Formula: risk_score = (100 - grade) * weight_factor
+// weight_factor increases when grade is below class average
+float calculate_risk_score(float grade, float class_average) {
+    float base_risk = 100.0 - grade;
+    float weight_factor;
+
+    if (grade < class_average) {
+        float deviation = class_average - grade;
+        weight_factor = 1.0 + (deviation / class_average);
+    } else {
+        weight_factor = 0.8;
+    }
+
+    float risk_score = base_risk * weight_factor;
+
+    // Clamp between 0 and 100
+    if (risk_score < 0.0) risk_score = 0.0;
+    if (risk_score > 100.0) risk_score = 100.0;
+
+    return risk_score;
+}
+
+// Runs the Academic Risk Index analysis on all students
