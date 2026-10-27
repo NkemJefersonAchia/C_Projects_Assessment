@@ -288,3 +288,28 @@ void calculate_average(StudentDB *db) {
 }
 
 // Finds and displays the top-performing student using pointer traversal
+void find_top_student(StudentDB *db) {
+    if (db->count == 0) {
+        printf("\nNo student records available.\n");
+        return;
+    }
+
+    Student *top = db->records;
+    Student *ptr = db->records + 1;
+    Student *end = db->records + db->count;
+
+    while (ptr < end) {
+        if (ptr->grade > top->grade) {
+            top = ptr;
+        }
+        ptr++;
+    }
+
+    printf("\n--- Top Performing Student ---\n");
+    printf("ID:     %d\n", top->id);
+    printf("Name:   %s\n", top->name);
+    printf("Course: %s\n", top->course);
+    printf("Grade:  %.1f\n", top->grade);
+}
+
+// Searches for a student by ID or name
