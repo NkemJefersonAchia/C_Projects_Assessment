@@ -459,3 +459,74 @@ float calculate_risk_score(float grade, float class_average) {
 }
 
 // Runs the Academic Risk Index analysis on all students
+void custom_analysis(StudentDB *db) {
+    if (db->count == 0) {
+        printf("\nNo student records available for analysis.\n");
+        return;
+    }
+
+    // Calculate class average first
+    float total = 0.0;
+    Student *ptr = db->records;
+    int i;
+    for (i = 0; i < db->count; i++) {
+        total += (ptr + i)->grade;
+    }
+    float class_average = total / db->count;
+
+    printf("\n========================================================\n");
+    printf("       ACADEMIC RISK INDEX ANALYSIS\n");
+    printf("========================================================\n");
+    printf("Class Average: %.2f\n", class_average);
+    printf("Risk Calculation: risk = (100 - grade) * weight_factor\n");
+    printf("  Weight factor is amplified when grade < class average\n");
+    printf("  Risk Levels: Low (0-30), Moderate (30-55),\n");
+    printf("               Elevated (55-75), High (75+)\n");
+    printf("--------------------------------------------------------\n");
+    printf("%-6s %-20s %-8s %-10s %-12s\n",
+           "ID", "Name", "Grade", "Risk Score", "Risk Level");
+    printf("--------------------------------------------------------\n");
+
+    int high_risk = 0, elevated_risk = 0, moderate_risk = 0, low_risk = 0;
+
+    ptr = db->records;
+    for (i = 0; i < db->count; i++, ptr++) {
+        float risk = calculate_risk_score(ptr->grade, class_average);
+        const char *level;
+
+        if (risk >= RISK_HIGH_THRESHOLD) {
+            level = "HIGH";
+            high_risk++;
+        } else if (risk >= RISK_ELEVATED_THRESHOLD) {
+            level = "ELEVATED";
+            elevated_risk++;
+        } else if (risk >= RISK_MODERATE_THRESHOLD) {
+            level = "MODERATE";
+            moderate_risk++;
+        } else {
+            level = "LOW";
+            low_risk++;
+        }
+
+        printf("%-6d %-20s %-8.1f %-10.2f %-12s\n",
+               ptr->id, ptr->name, ptr->grade, risk, level);
+    }
+
+    printf("--------------------------------------------------------\n");
+    printf("Risk Distribution:\n");
+    printf("  High Risk:     %d students (%.1f%%)\n",
+           high_risk, (float)high_risk / db->count * 100);
+    printf("  Elevated Risk: %d students (%.1f%%)\n",
+           elevated_risk, (float)elevated_risk / db->count * 100);
+    printf("  Moderate Risk: %d students (%.1f%%)\n",
+           moderate_risk, (float)moderate_risk / db->count * 100);
+    printf("  Low Risk:      %d students (%.1f%%)\n",
+           low_risk, (float)low_risk / db->count * 100);
+    printf("========================================================\n");
+
+    if (high_risk > 0) {
+        printf("\nRECOMMENDATION: %d student(s) require immediate academic support.\n",
+               high_risk);
+    }
+}
+
