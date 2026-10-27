@@ -102,3 +102,96 @@ void swap_students(Student *a, Student *b) {
     *b = temp;
 }
 
+// ---------------------------------------------------------------
+// Core record management functions
+// ---------------------------------------------------------------
+
+// Adds a new student record with input validation
+void add_student(StudentDB *db) {
+    int id;
+    char name[MAX_NAME_LEN];
+    char course[MAX_COURSE_LEN];
+    float grade;
+
+    printf("\n--- Add New Student ---\n");
+
+    // Get and validate student ID
+    printf("Enter student ID: ");
+    if (scanf("%d", &id) != 1) {
+        printf("Error: Invalid ID format.\n");
+        while (getchar() != '\n');
+        return;
+    }
+    while (getchar() != '\n');
+
+    // Check for duplicate ID
+    if (find_student_by_id(db, id) != -1) {
+        printf("Error: Student ID %d already exists.\n", id);
+        return;
+    }
+
+    // Get student name
+    printf("Enter student name: ");
+    if (fgets(name, MAX_NAME_LEN, stdin) == NULL) {
+        printf("Error: Failed to read name.\n");
+        return;
+    }
+    name[strcspn(name, "\n")] = '\0';
+    if (strlen(name) == 0) {
+        printf("Error: Name cannot be empty.\n");
+        return;
+    }
+
+    // Get course name
+    printf("Enter course name: ");
+    if (fgets(course, MAX_COURSE_LEN, stdin) == NULL) {
+        printf("Error: Failed to read course.\n");
+        return;
+    }
+    course[strcspn(course, "\n")] = '\0';
+    if (strlen(course) == 0) {
+        printf("Error: Course cannot be empty.\n");
+        return;
+    }
+
+    // Get and validate grade
+    printf("Enter grade (0-100): ");
+    if (scanf("%f", &grade) != 1) {
+        printf("Error: Invalid grade format.\n");
+        while (getchar() != '\n');
+        return;
+    }
+    while (getchar() != '\n');
+
+    if (grade < 0.0 || grade > 100.0) {
+        printf("Error: Grade must be between 0 and 100.\n");
+        return;
+    }
+
+    // Expand capacity if needed using realloc
+    if (db->count >= db->capacity) {
+        int new_capacity = db->capacity * 2;
+        Student *new_records = (Student *)realloc(db->records, new_capacity * sizeof(Student));
+        if (new_records == NULL) {
+            printf("Error: Memory reallocation failed. Cannot add student.\n");
+            return;
+        }
+        db->records = new_records;
+        db->capacity = new_capacity;
+        printf("(Database expanded to capacity %d)\n", new_capacity);
+    }
+
+    // Add the new student using pointer arithmetic
+    Student *new_student = db->records + db->count;
+    new_student->id = id;
+    strncpy(new_student->name, name, MAX_NAME_LEN - 1);
+    new_student->name[MAX_NAME_LEN - 1] = '\0';
+    strncpy(new_student->course, course, MAX_COURSE_LEN - 1);
+    new_student->course[MAX_COURSE_LEN - 1] = '\0';
+    new_student->grade = grade;
+
+    db->count++;
+    printf("Student '%s' (ID: %d) added successfully.\n", name, id);
+}
+
+// Displays all student records in a formatted table using pointer traversal
