@@ -217,3 +217,55 @@ void display_students(StudentDB *db) {
 }
 
 // Sorts students by user-selected criteria
+void sort_students(StudentDB *db) {
+    if (db->count < 2) {
+        printf("\nNot enough records to sort.\n");
+        return;
+    }
+
+    int choice;
+    printf("\n--- Sort Students ---\n");
+    printf("1. Sort by Grade (descending)\n");
+    printf("2. Sort by Name (alphabetical)\n");
+    printf("3. Sort by Student ID (ascending)\n");
+    printf("Enter choice: ");
+
+    if (scanf("%d", &choice) != 1 || choice < 1 || choice > 3) {
+        printf("Invalid sort option.\n");
+        while (getchar() != '\n');
+        return;
+    }
+    while (getchar() != '\n');
+
+    // Bubble sort with pointer-based traversal
+    int i, j;
+    for (i = 0; i < db->count - 1; i++) {
+        for (j = 0; j < db->count - i - 1; j++) {
+            Student *current = db->records + j;
+            Student *next = db->records + j + 1;
+            int should_swap = 0;
+
+            switch (choice) {
+                case 1:
+                    should_swap = (current->grade < next->grade);
+                    break;
+                case 2:
+                    should_swap = (strcmp(current->name, next->name) > 0);
+                    break;
+                case 3:
+                    should_swap = (current->id > next->id);
+                    break;
+            }
+
+            if (should_swap) {
+                swap_students(current, next);
+            }
+        }
+    }
+
+    const char *sort_labels[] = {"", "Grade (descending)", "Name (alphabetical)", "ID (ascending)"};
+    printf("Students sorted by %s.\n", sort_labels[choice]);
+    display_students(db);
+}
+
+// Calculates and displays the average grade using pointer arithmetic
