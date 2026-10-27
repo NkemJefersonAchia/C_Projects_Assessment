@@ -39,3 +39,42 @@ typedef struct {
 
 // Function pointer type for analysis operations
 typedef void (*AnalysisFunction)(TextData *);
+
+// ---------------------------------------------------------------
+// Lifecycle functions
+// ---------------------------------------------------------------
+
+// Creates and initializes a TextData container with dynamic memory
+TextData *create_text_data(void) {
+    TextData *data = (TextData *)malloc(sizeof(TextData));
+    if (data == NULL) {
+        printf("Error: Failed to allocate TextData structure.\n");
+        return NULL;
+    }
+
+    data->text = (char *)malloc(INITIAL_TEXT_SIZE * sizeof(char));
+    if (data->text == NULL) {
+        printf("Error: Failed to allocate text buffer.\n");
+        free(data);
+        return NULL;
+    }
+
+    data->words = (WordStat *)calloc(INITIAL_WORD_CAPACITY, sizeof(WordStat));
+    if (data->words == NULL) {
+        printf("Error: Failed to allocate word statistics array.\n");
+        free(data->text);
+        free(data);
+        return NULL;
+    }
+
+    data->text[0] = '\0';
+    data->text_length = 0;
+    data->text_capacity = INITIAL_TEXT_SIZE;
+    data->word_count = 0;
+    data->word_capacity = INITIAL_WORD_CAPACITY;
+    data->total_words = 0;
+
+    return data;
+}
+
+// Frees all dynamically allocated memory
