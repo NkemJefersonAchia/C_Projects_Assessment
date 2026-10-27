@@ -530,3 +530,81 @@ void custom_analysis(StudentDB *db) {
     }
 }
 
+// ---------------------------------------------------------------
+// Summary Report
+// ---------------------------------------------------------------
+
+// Generates a comprehensive summary report of all student data
+void generate_summary_report(StudentDB *db) {
+    if (db->count == 0) {
+        printf("\nNo student records available for summary.\n");
+        return;
+    }
+
+    float total = 0.0;
+    float highest = db->records->grade;
+    float lowest = db->records->grade;
+    int pass_count = 0;
+    int fail_count = 0;
+    char top_name[MAX_NAME_LEN];
+    char low_name[MAX_NAME_LEN];
+
+    strncpy(top_name, db->records->name, MAX_NAME_LEN - 1);
+    strncpy(low_name, db->records->name, MAX_NAME_LEN - 1);
+
+    Student *ptr = db->records;
+    int i;
+    for (i = 0; i < db->count; i++, ptr++) {
+        total += ptr->grade;
+
+        if (ptr->grade > highest) {
+            highest = ptr->grade;
+            strncpy(top_name, ptr->name, MAX_NAME_LEN - 1);
+        }
+        if (ptr->grade < lowest) {
+            lowest = ptr->grade;
+            strncpy(low_name, ptr->name, MAX_NAME_LEN - 1);
+        }
+
+        if (ptr->grade >= PASS_THRESHOLD) {
+            pass_count++;
+        } else {
+            fail_count++;
+        }
+    }
+
+    float average = total / db->count;
+
+    printf("\n========================================================\n");
+    printf("           ACADEMIC PERFORMANCE SUMMARY REPORT\n");
+    printf("========================================================\n");
+    printf("Total students:          %d\n", db->count);
+    printf("Average grade:           %.2f\n", average);
+    printf("Highest grade:           %.1f (%s)\n", highest, top_name);
+    printf("Lowest grade:            %.1f (%s)\n", lowest, low_name);
+    printf("Pass threshold:          %.1f\n", PASS_THRESHOLD);
+    printf("Students passing:        %d (%.1f%%)\n",
+           pass_count, (float)pass_count / db->count * 100);
+    printf("Students below threshold:%d (%.1f%%)\n",
+           fail_count, (float)fail_count / db->count * 100);
+    printf("========================================================\n");
+
+    // Include risk analysis results in summary
+    printf("\n--- Academic Risk Index Results ---\n");
+    int high_risk = 0;
+    ptr = db->records;
+    for (i = 0; i < db->count; i++, ptr++) {
+        float risk = calculate_risk_score(ptr->grade, average);
+        if (risk >= RISK_HIGH_THRESHOLD) {
+            high_risk++;
+        }
+    }
+    printf("Students at HIGH academic risk: %d\n", high_risk);
+    if (high_risk > 0) {
+        printf("These students need immediate intervention.\n");
+    } else {
+        printf("No students currently at high academic risk.\n");
+    }
+    printf("========================================================\n");
+}
+
