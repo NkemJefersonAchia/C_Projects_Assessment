@@ -187,3 +187,24 @@ void temperature_monitor(Device *device) {
 }
 
 // Pressure monitoring callback
+void pressure_monitor(Device *device) {
+    int pressure = device->reading.pressure;
+
+    printf("  [Pressure Monitor] Device %d (%s): %d hPa ",
+           device->id, device->name, pressure);
+
+    if (pressure < PRESSURE_ALERT_LOW || pressure > PRESSURE_ALERT_HIGH) {
+        device->status = STATUS_ALERT;
+        printf("-> ALERT!");
+        if (pressure < PRESSURE_ALERT_LOW)
+            printf(" (Below minimum %d hPa)", PRESSURE_ALERT_LOW);
+        else
+            printf(" (Exceeds maximum %d hPa)", PRESSURE_ALERT_HIGH);
+    } else {
+        device->status = STATUS_NORMAL;
+        printf("-> Normal");
+    }
+    printf("\n");
+}
+
+// Battery voltage monitoring callback
