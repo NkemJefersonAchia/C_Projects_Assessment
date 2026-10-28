@@ -91,3 +91,18 @@ void destroy_text_data(TextData *data) {
 // ---------------------------------------------------------------
 
 // Converts a string to lowercase in place using pointer traversal
+void to_lowercase(char *str) {
+    char *ptr = str;
+    while (*ptr != '\0') {
+        *ptr = tolower((unsigned char)*ptr);
+        ptr++;
+    }
+}
+
+// Checks if a character is part of a word
+// Letters and apostrophes are word characters; hyphens are separators
+int is_word_char(char c) {
+    return isalpha((unsigned char)c) || c == '\'';
+}
+
+// Adds a word to the word statistics array, incrementing count if duplicate
