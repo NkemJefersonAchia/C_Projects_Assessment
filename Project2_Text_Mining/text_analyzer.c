@@ -258,3 +258,67 @@ void load_text_wrapper(TextData *data) {
 // Case: all words converted to lowercase
 // Hyphens: treated as word separators
 // Long words: truncated to 39 characters to fit buffer
+void process_text(TextData *data) {
+    if (data->text_length == 0) {
+        printf("No text to process. Please load text first.\n");
+        return;
+    }
+
+    printf("\n--- Text Processing Rules ---\n");
+    printf("  - Letters (a-z, A-Z): included in words\n");
+    printf("  - Apostrophes: kept within words (e.g., \"don't\")\n");
+    printf("  - Hyphens: treated as word separators\n");
+    printf("  - Other punctuation: stripped (periods, commas, etc.)\n");
+    printf("  - Case: all words converted to lowercase\n");
+    printf("  - Long words: truncated to 39 characters\n");
+
+    data->word_count = 0;
+    data->total_words = 0;
+
+    char word_buffer[MAX_WORD_LEN];
+    int word_len = 0;
+
+    // Pointer-based traversal of the text buffer
+    char *ptr = data->text;
+    char *end = data->text + data->text_length;
+
+    while (ptr <= end) {
+        if (ptr < end && is_word_char(*ptr)) {
+            if (word_len < MAX_WORD_LEN - 1) {
+                word_buffer[word_len] = *ptr;
+                word_len++;
+            }
+        } else {
+            if (word_len > 0) {
+                word_buffer[word_len] = '\0';
+
+                // Strip trailing apostrophes
+                while (word_len > 0 && word_buffer[word_len - 1] == '\'') {
+                    word_buffer[word_len - 1] = '\0';
+                    word_len--;
+                }
+                // Strip leading apostrophes
+                char *start = word_buffer;
+                while (*start == '\'') start++;
+
+                if (strlen(start) > 0) {
+                    to_lowercase(start);
+                    add_word(data, start);
+                    data->total_words++;
+                }
+
+                word_len = 0;
+            }
+        }
+        ptr++;
+    }
+
+    printf("Text processed: %d total words, %d distinct words.\n",
+           data->total_words, data->word_count);
+}
+
+// ---------------------------------------------------------------
+// Analysis operations
+// ---------------------------------------------------------------
+
+// Displays the total word count
