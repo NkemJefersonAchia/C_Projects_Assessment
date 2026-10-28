@@ -82,3 +82,36 @@ typedef void (*DeviceCallback)(Device *);
 
 // Menu function pointer type
 typedef void (*MenuFunction)(DeviceDB *);
+
+// ---------------------------------------------------------------
+// Database lifecycle
+// ---------------------------------------------------------------
+
+// Creates a new device database with dynamic allocation
+DeviceDB *create_device_db(int initial_capacity) {
+    DeviceDB *db = (DeviceDB *)malloc(sizeof(DeviceDB));
+    if (db == NULL) {
+        printf("Error: Failed to allocate device database.\n");
+        return NULL;
+    }
+
+    db->devices = (Device *)calloc(initial_capacity, sizeof(Device));
+    if (db->devices == NULL) {
+        printf("Error: Failed to allocate device array.\n");
+        free(db);
+        return NULL;
+    }
+
+    db->count = 0;
+    db->capacity = initial_capacity;
+    db->total_readings = 0;
+    db->normal_readings = 0;
+    db->alert_readings = 0;
+    db->temp_alerts = 0;
+    db->pressure_alerts = 0;
+    db->battery_alerts = 0;
+
+    return db;
+}
+
+// Frees all dynamically allocated memory
