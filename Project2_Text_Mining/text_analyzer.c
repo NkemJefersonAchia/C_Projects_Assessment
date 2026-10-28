@@ -181,3 +181,48 @@ void load_default_text(TextData *data) {
 }
 
 // Reads text input from the user, dynamically expanding the buffer
+void input_text(TextData *data) {
+    printf("\nPaste or type your paragraph (press Enter twice to finish):\n");
+    printf("-----------------------------------------------------------\n");
+
+    data->text[0] = '\0';
+    data->text_length = 0;
+    data->word_count = 0;
+    data->total_words = 0;
+
+    int consecutive_newlines = 0;
+    int c;
+
+    while ((c = getchar()) != EOF) {
+        if (c == '\n') {
+            consecutive_newlines++;
+            if (consecutive_newlines >= 2) break;
+        } else {
+            consecutive_newlines = 0;
+        }
+
+        // Expand buffer if needed
+        if (data->text_length + 2 >= data->text_capacity) {
+            int new_capacity = data->text_capacity * 2;
+            char *new_text = (char *)realloc(data->text, new_capacity * sizeof(char));
+            if (new_text == NULL) {
+                printf("Error: Failed to expand text buffer.\n");
+                break;
+            }
+            data->text = new_text;
+            data->text_capacity = new_capacity;
+        }
+
+        data->text[data->text_length] = (char)c;
+        data->text_length++;
+        data->text[data->text_length] = '\0';
+    }
+
+    if (data->text_length > 0) {
+        printf("Text loaded successfully (%d characters).\n", data->text_length);
+    } else {
+        printf("Warning: No text was entered.\n");
+    }
+}
+
+// Wrapper for loading text - gives option to use default or custom input
