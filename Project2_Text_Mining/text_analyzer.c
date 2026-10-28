@@ -629,3 +629,76 @@ void generate_text_summary(TextData *data) {
 // Main function
 // ---------------------------------------------------------------
 
+int main(void) {
+    // Function pointer array for analysis operations
+    AnalysisFunction analysis_ops[NUM_ANALYSIS_OPS] = {
+        count_words,
+        longest_word,
+        most_frequent,
+        display_word_statistics,
+        sort_word_statistics,
+        search_word,
+        lexical_diversity_analysis,
+        inspect_memory,
+        generate_text_summary
+    };
+
+    TextData *data = create_text_data();
+    if (data == NULL) {
+        printf("Fatal error: Could not initialize text data.\n");
+        return 1;
+    }
+
+    printf("========================================================\n");
+    printf("Student ID: N.Achia\n");
+    printf("Project: Dynamic Text Mining and Linguistic Pattern\n");
+    printf("         Analyzer\n");
+    printf("Source: \"Things Fall Apart\" by Chinua Achebe\n");
+    printf("Custom Analysis: Lexical Diversity Score\n");
+    printf("========================================================\n");
+
+    int choice;
+    int running = 1;
+
+    while (running) {
+        printf("\n--- MAIN MENU ---\n");
+        printf("1.  Load/Enter text paragraph\n");
+        printf("2.  Process text into word statistics\n");
+        printf("3.  Count words\n");
+        printf("4.  Find longest word\n");
+        printf("5.  Find most frequent word\n");
+        printf("6.  Display word statistics\n");
+        printf("7.  Sort word statistics\n");
+        printf("8.  Search for a word\n");
+        printf("9.  Run Lexical Diversity Analysis\n");
+        printf("10. Inspect memory addresses\n");
+        printf("11. Generate text summary\n");
+        printf("12. Exit\n");
+        printf("Enter your choice: ");
+
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Please enter a number.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+        while (getchar() != '\n');
+
+        if (choice == 12) {
+            printf("\nFreeing all allocated memory...\n");
+            destroy_text_data(data);
+            printf("Program terminated. Goodbye!\n");
+            running = 0;
+        } else if (choice == 1) {
+            load_text_wrapper(data);
+        } else if (choice == 2) {
+            process_text(data);
+        } else if (choice >= 3 && choice <= 11) {
+            // Dispatch using function pointer array
+            analysis_ops[choice - 3](data);
+        } else {
+            printf("Invalid choice. Please select 1-12.\n");
+        }
+    }
+
+    return 0;
+}
