@@ -106,3 +106,40 @@ int is_word_char(char c) {
 }
 
 // Adds a word to the word statistics array, incrementing count if duplicate
+void add_word(TextData *data, const char *word) {
+    // Search for existing word using pointer traversal and strcmp
+    WordStat *ptr = data->words;
+    int i;
+    for (i = 0; i < data->word_count; i++, ptr++) {
+        if (strcmp(ptr->name, word) == 0) {
+            ptr->count++;
+            return;
+        }
+    }
+
+    // Word not found - expand array if needed
+    if (data->word_count >= data->word_capacity) {
+        int new_capacity = data->word_capacity * 2;
+        WordStat *new_words = (WordStat *)realloc(data->words,
+                                                    new_capacity * sizeof(WordStat));
+        if (new_words == NULL) {
+            printf("Error: Failed to expand word statistics array.\n");
+            return;
+        }
+        data->words = new_words;
+        data->word_capacity = new_capacity;
+    }
+
+    // Copy word into the new entry safely using strncpy
+    WordStat *new_entry = data->words + data->word_count;
+    strncpy(new_entry->name, word, MAX_WORD_LEN - 1);
+    new_entry->name[MAX_WORD_LEN - 1] = '\0';
+    new_entry->count = 1;
+    data->word_count++;
+}
+
+// ---------------------------------------------------------------
+// Text input functions
+// ---------------------------------------------------------------
+
+// Loads the default paragraph from "Things Fall Apart" by Chinua Achebe
