@@ -549,3 +549,28 @@ void lexical_diversity_analysis(TextData *data) {
 // ---------------------------------------------------------------
 
 // Prints memory addresses of key data structures using %p and (void *) casts
+void inspect_memory(TextData *data) {
+    printf("\n========================================================\n");
+    printf("              MEMORY INSPECTION\n");
+    printf("========================================================\n");
+    printf("Text buffer address:       %p\n", (void *)data->text);
+    printf("Word statistics array:     %p\n", (void *)data->words);
+
+    if (data->word_count > 0) {
+        int mid = data->word_count / 2;
+        WordStat *selected = data->words + mid;
+        printf("Selected word-stat entry:  %p  (\"%s\", count=%d)\n",
+               (void *)selected, selected->name, selected->count);
+    }
+
+    printf("TextData struct address:   %p\n", (void *)data);
+    printf("========================================================\n");
+    printf("Note: These addresses are heap-allocated and vary\n");
+    printf("      between program executions.\n");
+}
+
+// ---------------------------------------------------------------
+// Text Summary
+// ---------------------------------------------------------------
+
+// Generates a comprehensive text summary including all key statistics
