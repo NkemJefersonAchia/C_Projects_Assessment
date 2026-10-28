@@ -333,3 +333,29 @@ void count_words(TextData *data) {
 }
 
 // Finds and displays the longest word using pointer traversal and strlen
+void longest_word(TextData *data) {
+    if (data->word_count == 0) {
+        printf("\nNo words available. Process text first.\n");
+        return;
+    }
+
+    WordStat *longest = data->words;
+    int max_len = strlen(longest->name);
+
+    WordStat *ptr = data->words + 1;
+    WordStat *end = data->words + data->word_count;
+    while (ptr < end) {
+        int len = strlen(ptr->name);
+        if (len > max_len) {
+            max_len = len;
+            longest = ptr;
+        }
+        ptr++;
+    }
+
+    printf("\n--- Longest Word ---\n");
+    printf("Word:   \"%s\"\n", longest->name);
+    printf("Length: %d characters\n", max_len);
+}
+
+// Finds and displays the most frequently occurring word
