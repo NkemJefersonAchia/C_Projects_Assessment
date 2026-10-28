@@ -115,3 +115,25 @@ DeviceDB *create_device_db(int initial_capacity) {
 }
 
 // Frees all dynamically allocated memory
+void destroy_device_db(DeviceDB *db) {
+    if (db != NULL) {
+        if (db->devices != NULL) free(db->devices);
+        free(db);
+    }
+}
+
+// ---------------------------------------------------------------
+// Helper functions
+// ---------------------------------------------------------------
+
+// Returns string name for a device type
+const char *get_type_name(int type) {
+    switch (type) {
+        case DEVICE_TEMPERATURE: return "Temperature";
+        case DEVICE_PRESSURE:    return "Pressure";
+        case DEVICE_BATTERY:     return "Battery";
+        default:                 return "Unknown";
+    }
+}
+
+// Finds a device by ID using pointer traversal, returns index or -1
