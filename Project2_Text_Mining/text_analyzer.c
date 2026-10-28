@@ -447,3 +447,38 @@ void sort_word_statistics(TextData *data) {
 }
 
 // Searches for a specific word and reports its frequency
+void search_word(TextData *data) {
+    if (data->word_count == 0) {
+        printf("\nNo words available. Process text first.\n");
+        return;
+    }
+
+    char search_term[MAX_WORD_LEN];
+    printf("\nEnter word to search: ");
+    if (fgets(search_term, MAX_WORD_LEN, stdin) == NULL) {
+        printf("Error reading input.\n");
+        return;
+    }
+    search_term[strcspn(search_term, "\n")] = '\0';
+    to_lowercase(search_term);
+
+    WordStat *ptr = data->words;
+    int i;
+    for (i = 0; i < data->word_count; i++, ptr++) {
+        if (strcmp(ptr->name, search_term) == 0) {
+            printf("Word \"%s\" found with frequency: %d\n",
+                   ptr->name, ptr->count);
+            return;
+        }
+    }
+    printf("Word \"%s\" not found in the text.\n", search_term);
+}
+
+// ---------------------------------------------------------------
+// Custom Analysis: Lexical Diversity Score
+// ---------------------------------------------------------------
+
+// Measures the richness of vocabulary in the text
+// Formula: LDS = distinct_words / total_words (ranges 0 to 1)
+// Levels: Very High (0.80+), High (0.60+), Moderate (0.40+),
+//         Low (0.20+), Very Low (below 0.20)
