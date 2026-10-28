@@ -482,3 +482,70 @@ void search_word(TextData *data) {
 // Formula: LDS = distinct_words / total_words (ranges 0 to 1)
 // Levels: Very High (0.80+), High (0.60+), Moderate (0.40+),
 //         Low (0.20+), Very Low (below 0.20)
+void lexical_diversity_analysis(TextData *data) {
+    if (data->word_count == 0 || data->total_words == 0) {
+        printf("\nNo text has been processed for analysis.\n");
+        return;
+    }
+
+    float lds = (float)data->word_count / data->total_words;
+
+    const char *level;
+    if (lds >= 0.80) level = "Very High";
+    else if (lds >= 0.60) level = "High";
+    else if (lds >= 0.40) level = "Moderate";
+    else if (lds >= 0.20) level = "Low";
+    else level = "Very Low";
+
+    // Count repeated words and hapax legomena (words appearing once)
+    int repeated_words = 0;
+    int hapax_count = 0;
+    WordStat *most_repeated = data->words;
+
+    WordStat *ptr = data->words;
+    int i;
+    for (i = 0; i < data->word_count; i++, ptr++) {
+        if (ptr->count > 1) repeated_words++;
+        if (ptr->count == 1) hapax_count++;
+        if (ptr->count > most_repeated->count) most_repeated = ptr;
+    }
+
+    float repetition_intensity = (float)repeated_words / data->word_count;
+    float avg_frequency = (float)data->total_words / data->word_count;
+
+    printf("\n========================================================\n");
+    printf("       LEXICAL DIVERSITY SCORE ANALYSIS\n");
+    printf("========================================================\n");
+    printf("Formula: LDS = Distinct Words / Total Words\n");
+    printf("--------------------------------------------------------\n");
+    printf("Total words:             %d\n", data->total_words);
+    printf("Distinct words:          %d\n", data->word_count);
+    printf("Lexical Diversity Score: %.4f (%.1f%%)\n", lds, lds * 100);
+    printf("Diversity Level:         %s\n", level);
+    printf("--------------------------------------------------------\n");
+    printf("Additional Metrics:\n");
+    printf("  Words appearing once (hapax): %d (%.1f%% of distinct)\n",
+           hapax_count, (float)hapax_count / data->word_count * 100);
+    printf("  Repeated words:               %d (%.1f%% of distinct)\n",
+           repeated_words, repetition_intensity * 100);
+    printf("  Average word frequency:        %.2f\n", avg_frequency);
+    printf("  Most repeated word:            \"%s\" (%d times)\n",
+           most_repeated->name, most_repeated->count);
+    printf("========================================================\n");
+    printf("Interpretation:\n");
+    if (lds >= 0.60) {
+        printf("  The text has a rich vocabulary with good word variety.\n");
+    } else if (lds >= 0.40) {
+        printf("  The text has moderate diversity - a mix of unique and\n");
+        printf("  repeated words, typical of natural prose.\n");
+    } else {
+        printf("  The text is repetitive, with many frequently reused words.\n");
+    }
+    printf("========================================================\n");
+}
+
+// ---------------------------------------------------------------
+// Memory Address Inspection
+// ---------------------------------------------------------------
+
+// Prints memory addresses of key data structures using %p and (void *) casts
