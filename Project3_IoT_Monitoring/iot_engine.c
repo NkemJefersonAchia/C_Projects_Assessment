@@ -137,3 +137,27 @@ const char *get_type_name(int type) {
 }
 
 // Finds a device by ID using pointer traversal, returns index or -1
+int find_device_by_id(DeviceDB *db, int id) {
+    Device *ptr = db->devices;
+    int i;
+    for (i = 0; i < db->count; i++, ptr++) {
+        if (ptr->id == id) return i;
+    }
+    return -1;
+}
+
+// Generates a random float in [min, max] range
+float random_float(float min, float max) {
+    return min + ((float)rand() / (float)RAND_MAX) * (max - min);
+}
+
+// Generates a random integer in [min, max] range
+int random_int(int min, int max) {
+    return min + rand() % (max - min + 1);
+}
+
+// ---------------------------------------------------------------
+// Callback functions
+// ---------------------------------------------------------------
+
+// Generic callback dispatcher - processes a device through its callback
