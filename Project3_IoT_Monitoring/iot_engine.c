@@ -166,3 +166,24 @@ void process_device(Device *device, void (*callback)(Device *)) {
 }
 
 // Temperature monitoring callback
+void temperature_monitor(Device *device) {
+    float temp = device->reading.temperature;
+
+    printf("  [Temperature Monitor] Device %d (%s): %.1f C ",
+           device->id, device->name, temp);
+
+    if (temp < TEMP_ALERT_LOW || temp > TEMP_ALERT_HIGH) {
+        device->status = STATUS_ALERT;
+        printf("-> ALERT!");
+        if (temp < TEMP_ALERT_LOW)
+            printf(" (Below minimum %.1f C)", TEMP_ALERT_LOW);
+        else
+            printf(" (Exceeds maximum %.1f C)", TEMP_ALERT_HIGH);
+    } else {
+        device->status = STATUS_NORMAL;
+        printf("-> Normal");
+    }
+    printf("\n");
+}
+
+// Pressure monitoring callback
