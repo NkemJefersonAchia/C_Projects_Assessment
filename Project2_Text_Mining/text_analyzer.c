@@ -359,3 +359,25 @@ void longest_word(TextData *data) {
 }
 
 // Finds and displays the most frequently occurring word
+void most_frequent(TextData *data) {
+    if (data->word_count == 0) {
+        printf("\nNo words available. Process text first.\n");
+        return;
+    }
+
+    WordStat *most_freq = data->words;
+    WordStat *ptr = data->words + 1;
+    WordStat *end = data->words + data->word_count;
+    while (ptr < end) {
+        if (ptr->count > most_freq->count) {
+            most_freq = ptr;
+        }
+        ptr++;
+    }
+
+    printf("\n--- Most Frequent Word ---\n");
+    printf("Word:      \"%s\"\n", most_freq->name);
+    printf("Frequency: %d times\n", most_freq->count);
+}
+
+// Displays all distinct words and their frequencies
