@@ -400,3 +400,50 @@ void display_word_statistics(TextData *data) {
 }
 
 // Sorts word statistics alphabetically or by frequency
+void sort_word_statistics(TextData *data) {
+    if (data->word_count < 2) {
+        printf("\nNot enough words to sort.\n");
+        return;
+    }
+
+    int choice;
+    printf("\n--- Sort Word Statistics ---\n");
+    printf("1. Sort alphabetically\n");
+    printf("2. Sort by frequency (descending)\n");
+    printf("Enter choice: ");
+
+    if (scanf("%d", &choice) != 1 || (choice != 1 && choice != 2)) {
+        printf("Invalid sort option.\n");
+        while (getchar() != '\n');
+        return;
+    }
+    while (getchar() != '\n');
+
+    // Bubble sort using pointer-based traversal
+    int i, j;
+    for (i = 0; i < data->word_count - 1; i++) {
+        for (j = 0; j < data->word_count - i - 1; j++) {
+            WordStat *current = data->words + j;
+            WordStat *next = data->words + j + 1;
+            int should_swap = 0;
+
+            if (choice == 1) {
+                should_swap = (strcmp(current->name, next->name) > 0);
+            } else {
+                should_swap = (current->count < next->count);
+            }
+
+            if (should_swap) {
+                WordStat temp = *current;
+                *current = *next;
+                *next = temp;
+            }
+        }
+    }
+
+    printf("Words sorted %s.\n",
+           choice == 1 ? "alphabetically" : "by frequency (descending)");
+    display_word_statistics(data);
+}
+
+// Searches for a specific word and reports its frequency
