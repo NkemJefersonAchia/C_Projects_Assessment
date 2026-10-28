@@ -226,3 +226,35 @@ void input_text(TextData *data) {
 }
 
 // Wrapper for loading text - gives option to use default or custom input
+void load_text_wrapper(TextData *data) {
+    int choice;
+    printf("\n--- Load Text ---\n");
+    printf("1. Use default paragraph (Things Fall Apart)\n");
+    printf("2. Enter custom paragraph\n");
+    printf("Enter choice: ");
+
+    if (scanf("%d", &choice) != 1) {
+        printf("Invalid input.\n");
+        while (getchar() != '\n');
+        return;
+    }
+    while (getchar() != '\n');
+
+    if (choice == 1) {
+        load_default_text(data);
+    } else if (choice == 2) {
+        input_text(data);
+    } else {
+        printf("Invalid choice.\n");
+    }
+}
+
+// ---------------------------------------------------------------
+// Text processing
+// ---------------------------------------------------------------
+
+// Processes the loaded text into word statistics using pointer-based traversal
+// Punctuation: strips non-letter/non-apostrophe characters
+// Case: all words converted to lowercase
+// Hyphens: treated as word separators
+// Long words: truncated to 39 characters to fit buffer
