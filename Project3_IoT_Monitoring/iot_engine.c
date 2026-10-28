@@ -161,3 +161,8 @@ int random_int(int min, int max) {
 // ---------------------------------------------------------------
 
 // Generic callback dispatcher - processes a device through its callback
+void process_device(Device *device, void (*callback)(Device *)) {
+    callback(device);
+}
+
+// Temperature monitoring callback
