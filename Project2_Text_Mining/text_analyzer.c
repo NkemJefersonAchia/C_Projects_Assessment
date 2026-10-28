@@ -143,3 +143,41 @@ void add_word(TextData *data, const char *word) {
 // ---------------------------------------------------------------
 
 // Loads the default paragraph from "Things Fall Apart" by Chinua Achebe
+void load_default_text(TextData *data) {
+    const char *default_text =
+        "Okonkwo was well known throughout the nine villages and even beyond. "
+        "His fame rested on solid personal achievements. As a young man of eighteen "
+        "he had brought honor to his village by throwing Amalinze the Cat. Amalinze "
+        "was the great wrestler who for seven years was unbeaten from Umuofia to "
+        "Mbaino. He was called the Cat because his back would never touch the earth. "
+        "It was this man that Okonkwo threw in a fight which the old men agreed was "
+        "one of the fiercest since the founder of their town engaged a spirit of the "
+        "wild for seven days. The drums beat and the flutes sang and the spectators "
+        "held their breath. Amalinze was a wily craftsman but Okonkwo was as slippery "
+        "as a fish in water. Every nerve and every muscle stood out on their arms on "
+        "their backs and their thighs and one almost heard them stretching to breaking "
+        "point. In the end Okonkwo threw the Cat.";
+
+    int len = strlen(default_text);
+
+    // Ensure buffer is large enough
+    if (len + 1 > data->text_capacity) {
+        char *new_buf = (char *)realloc(data->text, (len + 1) * sizeof(char));
+        if (new_buf == NULL) {
+            printf("Error: Failed to allocate memory for text.\n");
+            return;
+        }
+        data->text = new_buf;
+        data->text_capacity = len + 1;
+    }
+
+    strcpy(data->text, default_text);
+    data->text_length = len;
+    data->word_count = 0;
+    data->total_words = 0;
+
+    printf("Default paragraph loaded (%d characters).\n", len);
+    printf("Source: \"Things Fall Apart\" by Chinua Achebe (Chapter 1)\n");
+}
+
+// Reads text input from the user, dynamically expanding the buffer
