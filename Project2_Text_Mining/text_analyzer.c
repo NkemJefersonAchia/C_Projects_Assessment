@@ -574,3 +574,58 @@ void inspect_memory(TextData *data) {
 // ---------------------------------------------------------------
 
 // Generates a comprehensive text summary including all key statistics
+void generate_text_summary(TextData *data) {
+    if (data->word_count == 0) {
+        printf("\nNo text has been processed yet.\n");
+        return;
+    }
+
+    // Calculate average word length
+    int total_char_count = 0;
+    WordStat *ptr = data->words;
+    int i;
+    for (i = 0; i < data->word_count; i++, ptr++) {
+        total_char_count += strlen(ptr->name) * ptr->count;
+    }
+    float avg_word_length = (float)total_char_count / data->total_words;
+
+    // Find longest word
+    WordStat *longest = data->words;
+    int max_len = strlen(longest->name);
+    ptr = data->words + 1;
+    for (i = 1; i < data->word_count; i++, ptr++) {
+        int len = strlen(ptr->name);
+        if (len > max_len) {
+            max_len = len;
+            longest = ptr;
+        }
+    }
+
+    // Find most frequent word
+    WordStat *most_freq = data->words;
+    ptr = data->words + 1;
+    for (i = 1; i < data->word_count; i++, ptr++) {
+        if (ptr->count > most_freq->count) most_freq = ptr;
+    }
+
+    // Lexical diversity
+    float diversity = (float)data->word_count / data->total_words;
+
+    printf("\n========================================================\n");
+    printf("             TEXT ANALYSIS SUMMARY\n");
+    printf("========================================================\n");
+    printf("Total words:             %d\n", data->total_words);
+    printf("Distinct words:          %d\n", data->word_count);
+    printf("Average word length:     %.2f characters\n", avg_word_length);
+    printf("Longest word:            \"%s\" (%d chars)\n", longest->name, max_len);
+    printf("Most frequent word:      \"%s\" (%d occurrences)\n",
+           most_freq->name, most_freq->count);
+    printf("Lexical Diversity Score: %.4f (%.1f%%)\n",
+           diversity, diversity * 100);
+    printf("========================================================\n");
+}
+
+// ---------------------------------------------------------------
+// Main function
+// ---------------------------------------------------------------
+
