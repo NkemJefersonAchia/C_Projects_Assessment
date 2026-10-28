@@ -208,3 +208,26 @@ void pressure_monitor(Device *device) {
 }
 
 // Battery voltage monitoring callback
+void battery_monitor(Device *device) {
+    float voltage = device->reading.voltage;
+
+    printf("  [Battery Monitor] Device %d (%s): %.2f V ",
+           device->id, device->name, voltage);
+
+    if (voltage < VOLTAGE_ALERT_LOW || voltage > VOLTAGE_ALERT_HIGH) {
+        device->status = STATUS_ALERT;
+        printf("-> ALERT!");
+        if (voltage < VOLTAGE_ALERT_LOW)
+            printf(" (Below minimum %.1f V - LOW BATTERY)", VOLTAGE_ALERT_LOW);
+        else
+            printf(" (Exceeds maximum %.1f V - OVERCHARGE)", VOLTAGE_ALERT_HIGH);
+    } else {
+        device->status = STATUS_NORMAL;
+        printf("-> Normal");
+    }
+    printf("\n");
+}
+
+// Custom Callback: Sensor Drift Detector
+// Detects significant changes between consecutive readings from the same device
+// Thresholds: Temperature > 10 C, Pressure > 30 hPa, Battery > 0.5 V
