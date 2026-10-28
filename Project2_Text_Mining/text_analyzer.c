@@ -381,3 +381,22 @@ void most_frequent(TextData *data) {
 }
 
 // Displays all distinct words and their frequencies
+void display_word_statistics(TextData *data) {
+    if (data->word_count == 0) {
+        printf("\nNo words available. Process text first.\n");
+        return;
+    }
+
+    printf("\n%-5s %-30s %-10s\n", "#", "Word", "Frequency");
+    printf("----------------------------------------------\n");
+
+    WordStat *ptr = data->words;
+    int i;
+    for (i = 0; i < data->word_count; i++, ptr++) {
+        printf("%-5d %-30s %-10d\n", i + 1, ptr->name, ptr->count);
+    }
+    printf("----------------------------------------------\n");
+    printf("Total distinct words: %d\n", data->word_count);
+}
+
+// Sorts word statistics alphabetically or by frequency
