@@ -40,3 +40,45 @@
 // Device status constants
 #define STATUS_NORMAL  0
 #define STATUS_ALERT   1
+
+// ---------------------------------------------------------------
+// Structures
+// ---------------------------------------------------------------
+
+// Union for type-specific readings - shares memory between sensor types
+typedef union {
+    float temperature;
+    int pressure;
+    float voltage;
+} SensorReading;
+
+// Device structure representing a single IoT device
+typedef struct {
+    int id;
+    char name[MAX_DEVICE_NAME];
+    int type;
+    SensorReading reading;
+    SensorReading prev_reading;
+    int status;
+    int has_previous;
+    int reading_count;
+} Device;
+
+// Device database container
+typedef struct {
+    Device *devices;
+    int count;
+    int capacity;
+    int total_readings;
+    int normal_readings;
+    int alert_readings;
+    int temp_alerts;
+    int pressure_alerts;
+    int battery_alerts;
+} DeviceDB;
+
+// Callback function pointer type
+typedef void (*DeviceCallback)(Device *);
+
+// Menu function pointer type
+typedef void (*MenuFunction)(DeviceDB *);
