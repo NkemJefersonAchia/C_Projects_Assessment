@@ -322,3 +322,14 @@ void process_text(TextData *data) {
 // ---------------------------------------------------------------
 
 // Displays the total word count
+void count_words(TextData *data) {
+    if (data->total_words == 0) {
+        printf("\nNo text has been processed yet.\n");
+        return;
+    }
+    printf("\n--- Word Count ---\n");
+    printf("Total words:    %d\n", data->total_words);
+    printf("Distinct words: %d\n", data->word_count);
+}
+
+// Finds and displays the longest word using pointer traversal and strlen
