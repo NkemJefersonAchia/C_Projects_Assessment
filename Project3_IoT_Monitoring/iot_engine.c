@@ -594,3 +594,56 @@ void display_alerts(DeviceDB *db) {
 }
 
 // Generates a comprehensive monitoring summary report
+void generate_summary(DeviceDB *db) {
+    printf("\n========================================================\n");
+    printf("         IoT MONITORING SUMMARY REPORT\n");
+    printf("========================================================\n");
+    printf("Total registered devices: %d\n", db->count);
+    printf("Total readings processed: %d\n", db->total_readings);
+    printf("Normal readings:          %d\n", db->normal_readings);
+    printf("Abnormal readings:        %d\n", db->alert_readings);
+    printf("--------------------------------------------------------\n");
+    printf("Alerts by Device Type:\n");
+    printf("  Temperature alerts: %d\n", db->temp_alerts);
+    printf("  Pressure alerts:    %d\n", db->pressure_alerts);
+    printf("  Battery alerts:     %d\n", db->battery_alerts);
+    printf("--------------------------------------------------------\n");
+
+    int temp_count = 0, pressure_count = 0, battery_count = 0;
+    int devices_in_alert = 0;
+    int drift_detections = 0;
+
+    Device *ptr = db->devices;
+    int i;
+    for (i = 0; i < db->count; i++, ptr++) {
+        switch (ptr->type) {
+            case DEVICE_TEMPERATURE: temp_count++; break;
+            case DEVICE_PRESSURE: pressure_count++; break;
+            case DEVICE_BATTERY: battery_count++; break;
+        }
+        if (ptr->status == STATUS_ALERT) devices_in_alert++;
+        if (ptr->has_previous) drift_detections++;
+    }
+
+    printf("Device Distribution:\n");
+    printf("  Temperature sensors: %d\n", temp_count);
+    printf("  Pressure sensors:    %d\n", pressure_count);
+    printf("  Battery monitors:    %d\n", battery_count);
+    printf("--------------------------------------------------------\n");
+    printf("Current Status:\n");
+    printf("  Devices in NORMAL state: %d\n", db->count - devices_in_alert);
+    printf("  Devices in ALERT state:  %d\n", devices_in_alert);
+    printf("--------------------------------------------------------\n");
+    printf("Custom Callback - Sensor Drift Detector:\n");
+    printf("  Devices with drift data: %d\n", drift_detections);
+    printf("  (Drift detection compares consecutive readings per device\n");
+    printf("   and alerts when change exceeds type-specific thresholds:\n");
+    printf("   Temperature > 10 C, Pressure > 30 hPa, Battery > 0.5 V)\n");
+    printf("========================================================\n");
+}
+
+// ---------------------------------------------------------------
+// Initial data loading
+// ---------------------------------------------------------------
+
+// Loads a pre-configured set of 10 IoT devices
