@@ -368,3 +368,49 @@ void register_device(DeviceDB *db) {
 }
 
 // Displays all registered devices in a formatted table
+void display_devices(DeviceDB *db) {
+    if (db->count == 0) {
+        printf("\nNo devices registered.\n");
+        return;
+    }
+
+    printf("\n%-6s %-25s %-15s %-15s %-10s\n",
+           "ID", "Name", "Type", "Last Reading", "Status");
+    printf("----------------------------------------------------------------------\n");
+
+    // Pointer-based traversal of device array
+    Device *ptr = db->devices;
+    Device *end = db->devices + db->count;
+    while (ptr < end) {
+        char reading_str[30];
+
+        // Access the correct union member based on device type
+        if (ptr->reading_count == 0) {
+            strcpy(reading_str, "No reading");
+        } else {
+            switch (ptr->type) {
+                case DEVICE_TEMPERATURE:
+                    sprintf(reading_str, "%.1f C", ptr->reading.temperature);
+                    break;
+                case DEVICE_PRESSURE:
+                    sprintf(reading_str, "%d hPa", ptr->reading.pressure);
+                    break;
+                case DEVICE_BATTERY:
+                    sprintf(reading_str, "%.2f V", ptr->reading.voltage);
+                    break;
+                default:
+                    strcpy(reading_str, "N/A");
+            }
+        }
+
+        printf("%-6d %-25s %-15s %-15s %-10s\n",
+               ptr->id, ptr->name, get_type_name(ptr->type),
+               reading_str,
+               ptr->status == STATUS_NORMAL ? "NORMAL" : "ALERT");
+        ptr++;
+    }
+    printf("----------------------------------------------------------------------\n");
+    printf("Total devices: %d\n", db->count);
+}
+
+// Removes a device by ID and shrinks the array
