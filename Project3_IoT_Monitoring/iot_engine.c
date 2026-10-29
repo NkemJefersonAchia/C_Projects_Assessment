@@ -647,3 +647,62 @@ void generate_summary(DeviceDB *db) {
 // ---------------------------------------------------------------
 
 // Loads a pre-configured set of 10 IoT devices
+void load_initial_devices(DeviceDB *db) {
+    struct {
+        int id;
+        char name[MAX_DEVICE_NAME];
+        int type;
+    } initial[] = {
+        {101, "Lab Thermostat A",      DEVICE_TEMPERATURE},
+        {102, "Server Room Temp",      DEVICE_TEMPERATURE},
+        {103, "Outdoor Weather Station", DEVICE_TEMPERATURE},
+        {104, "Barometer Station 1",   DEVICE_PRESSURE},
+        {105, "Barometer Station 2",   DEVICE_PRESSURE},
+        {106, "Altitude Pressure",     DEVICE_PRESSURE},
+        {107, "UPS Battery Pack A",    DEVICE_BATTERY},
+        {108, "Solar Panel Battery",   DEVICE_BATTERY},
+        {109, "Emergency Backup Batt", DEVICE_BATTERY},
+        {110, "Cold Storage Sensor",   DEVICE_TEMPERATURE}
+    };
+
+    int num_devices = sizeof(initial) / sizeof(initial[0]);
+    int i;
+
+    for (i = 0; i < num_devices; i++) {
+        if (db->count >= db->capacity) {
+            int new_cap = db->capacity * 2;
+            Device *new_devs = (Device *)realloc(db->devices,
+                                                   new_cap * sizeof(Device));
+            if (new_devs == NULL) {
+                printf("Error: Memory allocation failed during loading.\n");
+                return;
+            }
+            db->devices = new_devs;
+            db->capacity = new_cap;
+        }
+
+        Device *dev = db->devices + db->count;
+        dev->id = initial[i].id;
+        strncpy(dev->name, initial[i].name, MAX_DEVICE_NAME - 1);
+        dev->name[MAX_DEVICE_NAME - 1] = '\0';
+        dev->type = initial[i].type;
+        dev->status = STATUS_NORMAL;
+        dev->has_previous = 0;
+        dev->reading_count = 0;
+
+        switch (dev->type) {
+            case DEVICE_TEMPERATURE: dev->reading.temperature = 0.0; break;
+            case DEVICE_PRESSURE:    dev->reading.pressure = 0; break;
+            case DEVICE_BATTERY:     dev->reading.voltage = 0.0; break;
+        }
+
+        db->count++;
+    }
+
+    printf("Loaded %d initial IoT devices.\n", num_devices);
+}
+
+// ---------------------------------------------------------------
+// Main function
+// ---------------------------------------------------------------
+
