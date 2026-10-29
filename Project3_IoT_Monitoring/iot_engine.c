@@ -706,3 +706,68 @@ void load_initial_devices(DeviceDB *db) {
 // Main function
 // ---------------------------------------------------------------
 
+int main(void) {
+    srand((unsigned int)time(NULL));
+
+    // Function pointer array for menu dispatch
+    MenuFunction menu_functions[NUM_MENU_OPTIONS] = {
+        register_device,
+        display_devices,
+        remove_device,
+        generate_readings,
+        display_alerts,
+        generate_summary,
+        NULL
+    };
+
+    DeviceDB *db = create_device_db(INITIAL_DEVICE_CAPACITY);
+    if (db == NULL) {
+        printf("Fatal error: Could not initialize device database.\n");
+        return 1;
+    }
+
+    printf("========================================================\n");
+    printf("Student ID: N.Achia\n");
+    printf("Project: Dynamic IoT Event Monitoring and Callback\n");
+    printf("         Engine\n");
+    printf("Custom Callback: Sensor Drift Detector\n");
+    printf("========================================================\n");
+
+    load_initial_devices(db);
+
+    int choice;
+    int running = 1;
+
+    while (running) {
+        printf("\n--- MAIN MENU ---\n");
+        printf("1. Register a new device\n");
+        printf("2. Display all registered devices\n");
+        printf("3. Remove a device\n");
+        printf("4. Generate simulated readings\n");
+        printf("5. Display detected alerts\n");
+        printf("6. Generate monitoring summary\n");
+        printf("7. Exit\n");
+        printf("Enter your choice: ");
+
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Please enter a number.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+        while (getchar() != '\n');
+
+        if (choice == 7) {
+            printf("\nFreeing all allocated memory...\n");
+            destroy_device_db(db);
+            printf("Program terminated. Goodbye!\n");
+            running = 0;
+        } else if (choice >= 1 && choice <= 6) {
+            // Dispatch using function pointer array
+            menu_functions[choice - 1](db);
+        } else {
+            printf("Invalid choice. Please select 1-7.\n");
+        }
+    }
+
+    return 0;
+}
