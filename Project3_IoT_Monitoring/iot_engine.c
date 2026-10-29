@@ -289,3 +289,82 @@ DeviceCallback get_callback_for_type(int type) {
 // ---------------------------------------------------------------
 
 // Registers a new device with input validation
+void register_device(DeviceDB *db) {
+    int id, type;
+    char name[MAX_DEVICE_NAME];
+
+    printf("\n--- Register New Device ---\n");
+
+    printf("Enter device ID: ");
+    if (scanf("%d", &id) != 1) {
+        printf("Error: Invalid ID format.\n");
+        while (getchar() != '\n');
+        return;
+    }
+    while (getchar() != '\n');
+
+    if (find_device_by_id(db, id) != -1) {
+        printf("Error: Device ID %d already exists.\n", id);
+        return;
+    }
+
+    printf("Enter device name: ");
+    if (fgets(name, MAX_DEVICE_NAME, stdin) == NULL) {
+        printf("Error: Failed to read name.\n");
+        return;
+    }
+    name[strcspn(name, "\n")] = '\0';
+    if (strlen(name) == 0) {
+        printf("Error: Name cannot be empty.\n");
+        return;
+    }
+
+    printf("Select device type:\n");
+    printf("  1. Temperature Sensor\n");
+    printf("  2. Pressure Sensor\n");
+    printf("  3. Battery Voltage Monitor\n");
+    printf("Enter type (1-3): ");
+    if (scanf("%d", &type) != 1 || type < 1 || type > 3) {
+        printf("Error: Invalid device type.\n");
+        while (getchar() != '\n');
+        return;
+    }
+    while (getchar() != '\n');
+
+    // Expand array if at capacity using realloc
+    if (db->count >= db->capacity) {
+        int new_capacity = db->capacity * 2;
+        Device *new_devices = (Device *)realloc(db->devices,
+                                                  new_capacity * sizeof(Device));
+        if (new_devices == NULL) {
+            printf("Error: Memory reallocation failed.\n");
+            return;
+        }
+        db->devices = new_devices;
+        db->capacity = new_capacity;
+        printf("(Device array expanded to capacity %d)\n", new_capacity);
+    }
+
+    // Initialize the new device using pointer arithmetic
+    Device *new_dev = db->devices + db->count;
+    new_dev->id = id;
+    strncpy(new_dev->name, name, MAX_DEVICE_NAME - 1);
+    new_dev->name[MAX_DEVICE_NAME - 1] = '\0';
+    new_dev->type = type;
+    new_dev->status = STATUS_NORMAL;
+    new_dev->has_previous = 0;
+    new_dev->reading_count = 0;
+
+    // Initialize the appropriate union member based on type
+    switch (type) {
+        case DEVICE_TEMPERATURE: new_dev->reading.temperature = 0.0; break;
+        case DEVICE_PRESSURE:    new_dev->reading.pressure = 0; break;
+        case DEVICE_BATTERY:     new_dev->reading.voltage = 0.0; break;
+    }
+
+    db->count++;
+    printf("Device '%s' (ID: %d, Type: %s) registered.\n",
+           name, id, get_type_name(type));
+}
+
+// Displays all registered devices in a formatted table
