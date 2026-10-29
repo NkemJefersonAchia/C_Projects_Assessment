@@ -538,3 +538,59 @@ void generate_readings(DeviceDB *db) {
 }
 
 // Displays all currently active alerts
+void display_alerts(DeviceDB *db) {
+    if (db->count == 0) {
+        printf("\nNo devices registered.\n");
+        return;
+    }
+
+    printf("\n========================================================\n");
+    printf("             ACTIVE ALERTS\n");
+    printf("========================================================\n");
+
+    int alert_count = 0;
+    Device *ptr = db->devices;
+    int i;
+
+    for (i = 0; i < db->count; i++, ptr++) {
+        if (ptr->status == STATUS_ALERT && ptr->reading_count > 0) {
+            alert_count++;
+            printf("\nALERT #%d:\n", alert_count);
+            printf("  Device ID:   %d\n", ptr->id);
+            printf("  Device Name: %s\n", ptr->name);
+
+            switch (ptr->type) {
+                case DEVICE_TEMPERATURE:
+                    printf("  Reading:     %.1f C\n", ptr->reading.temperature);
+                    printf("  Expected:    %.1f C to %.1f C\n",
+                           TEMP_ALERT_LOW, TEMP_ALERT_HIGH);
+                    break;
+                case DEVICE_PRESSURE:
+                    printf("  Reading:     %d hPa\n", ptr->reading.pressure);
+                    printf("  Expected:    %d hPa to %d hPa\n",
+                           PRESSURE_ALERT_LOW, PRESSURE_ALERT_HIGH);
+                    break;
+                case DEVICE_BATTERY:
+                    printf("  Reading:     %.2f V\n", ptr->reading.voltage);
+                    printf("  Expected:    %.1f V to %.1f V\n",
+                           VOLTAGE_ALERT_LOW, VOLTAGE_ALERT_HIGH);
+                    break;
+            }
+
+            printf("  Reason:      Reading outside safe operating range\n");
+            printf("  Callback:    %s_monitor()\n",
+                   ptr->type == DEVICE_TEMPERATURE ? "temperature" :
+                   ptr->type == DEVICE_PRESSURE ? "pressure" : "battery");
+        }
+    }
+
+    if (alert_count == 0) {
+        printf("No active alerts. All devices operating normally.\n");
+    } else {
+        printf("\n--------------------------------------------------------\n");
+        printf("Total active alerts: %d\n", alert_count);
+    }
+    printf("========================================================\n");
+}
+
+// Generates a comprehensive monitoring summary report
