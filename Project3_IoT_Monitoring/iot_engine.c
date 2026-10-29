@@ -414,3 +414,59 @@ void display_devices(DeviceDB *db) {
 }
 
 // Removes a device by ID and shrinks the array
+void remove_device(DeviceDB *db) {
+    if (db->count == 0) {
+        printf("\nNo devices to remove.\n");
+        return;
+    }
+
+    int id;
+    printf("\n--- Remove Device ---\n");
+    printf("Enter device ID to remove: ");
+    if (scanf("%d", &id) != 1) {
+        printf("Invalid ID format.\n");
+        while (getchar() != '\n');
+        return;
+    }
+    while (getchar() != '\n');
+
+    int index = find_device_by_id(db, id);
+    if (index == -1) {
+        printf("Device with ID %d not found.\n", id);
+        return;
+    }
+
+    char removed_name[MAX_DEVICE_NAME];
+    strncpy(removed_name, (db->devices + index)->name, MAX_DEVICE_NAME - 1);
+    removed_name[MAX_DEVICE_NAME - 1] = '\0';
+
+    // Shift remaining devices left
+    Device *target = db->devices + index;
+    Device *source = target + 1;
+    int remaining = db->count - index - 1;
+    if (remaining > 0) {
+        memmove(target, source, remaining * sizeof(Device));
+    }
+
+    db->count--;
+    printf("Device '%s' (ID: %d) removed.\n", removed_name, id);
+
+    // Shrink if count drops below quarter capacity
+    if (db->count > 0 && db->count < db->capacity / 4
+        && db->capacity > INITIAL_DEVICE_CAPACITY) {
+        int new_cap = db->capacity / 2;
+        if (new_cap < INITIAL_DEVICE_CAPACITY) new_cap = INITIAL_DEVICE_CAPACITY;
+        Device *new_devs = (Device *)realloc(db->devices, new_cap * sizeof(Device));
+        if (new_devs != NULL) {
+            db->devices = new_devs;
+            db->capacity = new_cap;
+            printf("(Device array shrunk to capacity %d)\n", new_cap);
+        }
+    }
+}
+
+// ---------------------------------------------------------------
+// Simulation and reporting
+// ---------------------------------------------------------------
+
+// Generates simulated readings for all registered devices
