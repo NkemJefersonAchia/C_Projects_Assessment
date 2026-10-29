@@ -231,3 +231,61 @@ void battery_monitor(Device *device) {
 // Custom Callback: Sensor Drift Detector
 // Detects significant changes between consecutive readings from the same device
 // Thresholds: Temperature > 10 C, Pressure > 30 hPa, Battery > 0.5 V
+void sensor_drift_detector(Device *device) {
+    if (!device->has_previous) {
+        printf("  [Drift Detector] Device %d (%s): First reading - "
+               "no drift data yet.\n", device->id, device->name);
+        return;
+    }
+
+    float drift = 0.0;
+    float threshold = 0.0;
+    const char *unit = "";
+
+    // Calculate drift based on device type, accessing correct union member
+    switch (device->type) {
+        case DEVICE_TEMPERATURE:
+            drift = fabs(device->reading.temperature - device->prev_reading.temperature);
+            threshold = 10.0;
+            unit = "C";
+            printf("  [Drift Detector] Device %d (%s): Drift = %.1f %s ",
+                   device->id, device->name, drift, unit);
+            break;
+        case DEVICE_PRESSURE:
+            drift = abs(device->reading.pressure - device->prev_reading.pressure);
+            threshold = 30.0;
+            unit = "hPa";
+            printf("  [Drift Detector] Device %d (%s): Drift = %.0f %s ",
+                   device->id, device->name, drift, unit);
+            break;
+        case DEVICE_BATTERY:
+            drift = fabs(device->reading.voltage - device->prev_reading.voltage);
+            threshold = 0.5;
+            unit = "V";
+            printf("  [Drift Detector] Device %d (%s): Drift = %.2f %s ",
+                   device->id, device->name, drift, unit);
+            break;
+    }
+
+    if (drift > threshold) {
+        printf("-> DRIFT ALERT! (threshold: %.1f %s)\n", threshold, unit);
+    } else {
+        printf("-> Stable (within threshold)\n");
+    }
+}
+
+// Returns the appropriate callback for a given device type
+DeviceCallback get_callback_for_type(int type) {
+    switch (type) {
+        case DEVICE_TEMPERATURE: return temperature_monitor;
+        case DEVICE_PRESSURE:    return pressure_monitor;
+        case DEVICE_BATTERY:     return battery_monitor;
+        default:                 return NULL;
+    }
+}
+
+// ---------------------------------------------------------------
+// Device management operations
+// ---------------------------------------------------------------
+
+// Registers a new device with input validation
