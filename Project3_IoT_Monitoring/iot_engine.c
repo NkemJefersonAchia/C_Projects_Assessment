@@ -470,3 +470,71 @@ void remove_device(DeviceDB *db) {
 // ---------------------------------------------------------------
 
 // Generates simulated readings for all registered devices
+void generate_readings(DeviceDB *db) {
+    if (db->count == 0) {
+        printf("\nNo devices registered. Register devices first.\n");
+        return;
+    }
+
+    printf("\n========================================================\n");
+    printf("       GENERATING SIMULATED READINGS\n");
+    printf("========================================================\n");
+
+    Device *ptr = db->devices;
+    Device *end = db->devices + db->count;
+    int reading_num = 1;
+
+    while (ptr < end) {
+        // Save previous reading before generating new one
+        if (ptr->reading_count > 0) {
+            ptr->prev_reading = ptr->reading;
+            ptr->has_previous = 1;
+        }
+
+        printf("\nReading #%d:\n", reading_num);
+
+        // Generate reading based on device type, writing to correct union member
+        switch (ptr->type) {
+            case DEVICE_TEMPERATURE:
+                ptr->reading.temperature = random_float(TEMP_MIN, TEMP_MAX);
+                break;
+            case DEVICE_PRESSURE:
+                ptr->reading.pressure = random_int(PRESSURE_MIN, PRESSURE_MAX);
+                break;
+            case DEVICE_BATTERY:
+                ptr->reading.voltage = random_float(VOLTAGE_MIN, VOLTAGE_MAX);
+                break;
+        }
+
+        ptr->reading_count++;
+
+        // Get the appropriate callback using function pointer dispatch
+        DeviceCallback callback = get_callback_for_type(ptr->type);
+        if (callback != NULL) {
+            process_device(ptr, callback);
+
+            db->total_readings++;
+            if (ptr->status == STATUS_ALERT) {
+                db->alert_readings++;
+                switch (ptr->type) {
+                    case DEVICE_TEMPERATURE: db->temp_alerts++; break;
+                    case DEVICE_PRESSURE: db->pressure_alerts++; break;
+                    case DEVICE_BATTERY: db->battery_alerts++; break;
+                }
+            } else {
+                db->normal_readings++;
+            }
+
+            // Also run custom drift detector callback via function pointer
+            process_device(ptr, sensor_drift_detector);
+        }
+
+        reading_num++;
+        ptr++;
+    }
+
+    printf("\n========================================================\n");
+    printf("Generated %d readings for %d devices.\n", db->count, db->count);
+}
+
+// Displays all currently active alerts
