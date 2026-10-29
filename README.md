@@ -1,6 +1,6 @@
 # C Programming Projects Assessment
 
-**Student:** N. Achia  
+**Student:** Nkem Jeferson Achia  
 **Course:** C Programming - Trimester 6  
 **Date:** October 2026
 
